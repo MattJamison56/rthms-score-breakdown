@@ -179,13 +179,13 @@ export const TagSelectionPage = ({ onComplete, initialPerson1Tags, initialPerson
         <div className="flex justify-center gap-4 mt-12 mb-8">
           <button
             onClick={handleClearAll}
-            className="px-8 py-4 bg-slate-800 hover:bg-slate-700 rounded-full text-gray-300 font-bold text-lg transition-all hover:scale-105"
+            className="px-6 py-4 bg-slate-800 hover:bg-slate-700 rounded-full text-gray-300 font-bold text-md transition-all hover:scale-105"
           >
             CLEAR ALL
           </button>
           <button
             onClick={handleContinue}
-            className="px-16 py-4 bg-linear-to-r from-cyan-500 to-blue-600 rounded-full text-white font-bold text-lg shadow-lg shadow-cyan-500/50 hover:shadow-cyan-500/70 transition-all hover:scale-105"
+            className="px-12 py-4 bg-linear-to-r from-cyan-500 to-blue-600 rounded-full text-white font-bold text-md shadow-lg shadow-cyan-500/50 hover:shadow-cyan-500/70 transition-all hover:scale-105"
           >
             START COMPATIBILITY TEST
           </button>

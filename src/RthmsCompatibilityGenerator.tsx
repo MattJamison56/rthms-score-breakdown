@@ -9,6 +9,7 @@ import { ActivityPage } from './components/pages/ActivityPage';
 import { LifestylePage } from './components/pages/LifestylePage';
 import { Navigation } from './components/Navigation';
 import { TagSelectionPage } from './components/pages/TagSelectionPage';
+import { CompatibilityReportPage } from './components/pages/CompatibilityReportPage';
 
 const RthmsCompatibilityGenerator = () => {
   const [showTagSelection, setShowTagSelection] = useState(true);
@@ -87,6 +88,8 @@ const RthmsCompatibilityGenerator = () => {
           iconTextColor="text-purple-400"
           timeTextColor="text-purple-400"
           hoverBorderColor="hover:border-purple-500/50"
+          person1={person1}
+          person2={person2}
         />
       )
     },
@@ -110,6 +113,8 @@ const RthmsCompatibilityGenerator = () => {
           iconTextColor="text-emerald-400"
           timeTextColor="text-emerald-400"
           hoverBorderColor="hover:border-emerald-500/50"
+          person1={person1}
+          person2={person2}
         />
       )
     },
@@ -133,6 +138,8 @@ const RthmsCompatibilityGenerator = () => {
           iconTextColor="text-orange-400"
           timeTextColor="text-orange-400"
           hoverBorderColor="hover:border-orange-500/50"
+          person1={person1}
+          person2={person2}
         />
       )
     },
@@ -156,7 +163,16 @@ const RthmsCompatibilityGenerator = () => {
           iconTextColor="text-cyan-400"
           timeTextColor="text-cyan-400"
           hoverBorderColor="hover:border-cyan-500/50"
+          person1={person1}
+          person2={person2}
         />
+      )
+    },
+    {
+      type: 'final-report',
+      title: 'Compatibility Reading',
+      render: () => (
+        <CompatibilityReportPage person1={person1} person2={person2} />
       )
     }
   ];
