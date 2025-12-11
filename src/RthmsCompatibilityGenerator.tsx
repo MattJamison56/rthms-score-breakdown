@@ -204,14 +204,22 @@ const RthmsCompatibilityGenerator = () => {
 
   return (
     <>
-      {showTagSelection ? (
-        <TagSelectionPage 
-          onComplete={handleTagSelectionComplete}
-          initialPerson1Tags={person1.tags}
-          initialPerson2Tags={person2.tags}
-        />
-      ) : (
-        <div className="min-h-screen bg-black flex items-center justify-center p-4">
+      <div className="min-h-screen bg-black flex items-center justify-center p-4">
+        {showTagSelection ? (
+          <div className="relative w-full max-w-sm">
+            <div 
+              className="bg-black rounded-[3rem] shadow-2xl overflow-y-auto border border-gray-800 no-scrollbar" 
+              style={{ aspectRatio: '9/19.5' }}
+            >
+              <TagSelectionPage 
+                onComplete={handleTagSelectionComplete}
+                initialPerson1Tags={person1.tags}
+                initialPerson2Tags={person2.tags}
+              />
+            </div>
+          </div>
+        ) : (
+          <>
           <style>{`
             @keyframes scroll-right {
               from { transform: translateX(-100%); }
@@ -278,7 +286,7 @@ const RthmsCompatibilityGenerator = () => {
             }
           `}</style>
           
-          <div className="relative w-full max-w-md">
+          <div className="relative w-full max-w-sm">
             <div 
               className="bg-black rounded-[3rem] shadow-2xl overflow-hidden border border-gray-800 cursor-pointer" 
               style={{ aspectRatio: '9/19.5' }}
@@ -298,8 +306,9 @@ const RthmsCompatibilityGenerator = () => {
               {pages[currentPage].render()}
             </div>
           </div>
-        </div>
-      )}
+          </>
+        )}
+      </div>
     </>
   );
 };

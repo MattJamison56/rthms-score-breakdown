@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
+import { Info } from 'lucide-react';
 import type { PersonTags } from '../../types/compatibility';
-import { ALL_TAGS, hasConflict } from '../../data/allTags';
+import { ALL_TAGS, hasConflict, MUTUALLY_EXCLUSIVE_GROUPS } from '../../data/allTags';
+import { TagInfoPage } from './TagInfoPage';
 
 interface TagSelectionPageProps {
   onComplete: (person1Tags: PersonTags, person2Tags: PersonTags) => void;
@@ -10,6 +12,7 @@ interface TagSelectionPageProps {
 
 export const TagSelectionPage = ({ onComplete, initialPerson1Tags, initialPerson2Tags }: TagSelectionPageProps) => {
   const [selectedPerson, setSelectedPerson] = useState<1 | 2>(1);
+  const [showInfo, setShowInfo] = useState(false);
   const [person1Tags, setPerson1Tags] = useState<PersonTags>(
     initialPerson1Tags || {
       sleep: [],
@@ -97,9 +100,55 @@ export const TagSelectionPage = ({ onComplete, initialPerson1Tags, initialPerson
     lifestyle: 'from-blue-500 to-cyan-600'
   };
 
+  // Helper to get all tags in mutually exclusive groups for a category
+  const getGroupedTags = (category: keyof typeof ALL_TAGS) => {
+    const categoryTags = ALL_TAGS[category];
+    const grouped: { group: string[] | null; tags: string[] }[] = [];
+    const processedTags = new Set<string>();
+
+    // First, add mutually exclusive groups
+    MUTUALLY_EXCLUSIVE_GROUPS.forEach(group => {
+      const tagsInCategory = group.filter((tag: string) => categoryTags.includes(tag));
+      if (tagsInCategory.length > 0) {
+        grouped.push({ group, tags: tagsInCategory });
+        tagsInCategory.forEach((tag: string) => processedTags.add(tag));
+      }
+    });
+
+    // Then, add remaining tags that aren't in any group
+    const remainingTags = categoryTags.filter((tag: string) => !processedTags.has(tag));
+    if (remainingTags.length > 0) {
+      grouped.push({ group: null, tags: remainingTags });
+    }
+
+    return grouped;
+  };
+
+  if (showInfo) {
+    return <TagInfoPage onClose={() => setShowInfo(false)} />;
+  }
+
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-950 via-purple-950 to-slate-950 p-6 overflow-y-auto">
-      <div className="max-w-6xl mx-auto">
+    <div className="w-full h-full bg-linear-to-br from-slate-950 via-purple-950 to-slate-950 p-6 overflow-y-auto no-scrollbar">
+      <style>{`
+        .no-scrollbar {
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
+      <div className="max-w-4xl mx-auto">
+        <div className="flex justify-center mb-6">
+          <button
+            onClick={() => setShowInfo(true)}
+            className="p-3 bg-slate-800 hover:bg-slate-700 rounded-full text-gray-300 transition-all hover:scale-105"
+            title="View tag information"
+          >
+            <Info size={24} />
+          </button>
+        </div>
         <h1 className="text-4xl font-bold text-white text-center mb-4">
           Test Tag Selector
         </h1>
@@ -143,49 +192,62 @@ export const TagSelectionPage = ({ onComplete, initialPerson1Tags, initialPerson
 
         {/* Tag Categories */}
         <div className="space-y-8">
-          {(Object.keys(ALL_TAGS) as Array<keyof typeof ALL_TAGS>).map(category => (
-            <div key={category} className="bg-slate-900/50 rounded-2xl p-6 border border-slate-800">
-              <h2 className={`text-2xl font-bold mb-4 bg-linear-to-r ${categoryColors[category]} bg-clip-text text-transparent capitalize`}>
-                {category}
-              </h2>
-              <div className="flex flex-wrap gap-3">
-                {ALL_TAGS[category].map(tag => {
-                  const selected = isTagSelected(category, tag);
-                  const disabled = !selected && isTagDisabled(tag);
-                  
-                  return (
-                    <button
-                      key={tag}
-                      onClick={() => !disabled && toggleTag(category, tag)}
-                      disabled={disabled}
-                      className={`px-4 py-2 rounded-full font-medium transition-all ${
-                        selected
-                          ? `bg-linear-to-r ${categoryColors[category]} text-white shadow-lg`
-                          : disabled
-                          ? 'bg-slate-800/30 text-gray-600 cursor-not-allowed opacity-50'
-                          : 'bg-slate-800 text-gray-300 hover:bg-slate-700 hover:text-white'
-                      }`}
-                    >
-                      {tag}
-                    </button>
-                  );
-                })}
+          {(Object.keys(ALL_TAGS) as Array<keyof typeof ALL_TAGS>).map(category => {
+            const groupedTags = getGroupedTags(category);
+            
+            return (
+              <div key={category} className="bg-slate-900/50 rounded-2xl p-6 border border-slate-800">
+                <h2 className={`text-2xl font-bold mb-4 bg-linear-to-r ${categoryColors[category]} bg-clip-text text-transparent capitalize`}>
+                  {category}
+                </h2>
+                <div className="space-y-4">
+                  {groupedTags.map((section, idx) => (
+                    <div key={idx}>
+                      {section.group && (
+                        <div className="text-xs text-gray-500 mb-2 ml-1">Choose one:</div>
+                      )}
+                      <div className="flex flex-wrap gap-3">
+                        {section.tags.map(tag => {
+                          const selected = isTagSelected(category, tag);
+                          const disabled = !selected && isTagDisabled(tag);
+                          
+                          return (
+                            <button
+                              key={tag}
+                              onClick={() => !disabled && toggleTag(category, tag)}
+                              disabled={disabled}
+                              className={`px-4 py-2 rounded-full font-medium transition-all ${
+                                selected
+                                  ? `bg-linear-to-r ${categoryColors[category]} text-white shadow-lg`
+                                  : disabled
+                                  ? 'bg-slate-800/30 text-gray-600 cursor-not-allowed opacity-50'
+                                  : 'bg-slate-800 text-gray-300 hover:bg-slate-700 hover:text-white'
+                              }`}
+                            >
+                              {tag}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Action Buttons */}
         <div className="flex justify-center gap-4 mt-12 mb-8">
           <button
             onClick={handleClearAll}
-            className="px-6 py-4 bg-slate-800 hover:bg-slate-700 rounded-full text-gray-300 font-bold text-md transition-all hover:scale-105"
+            className="px-6 py-4 bg-slate-800 hover:bg-slate-700 rounded-full text-gray-300 font-bold text-sm transition-all hover:scale-105"
           >
             CLEAR ALL
           </button>
           <button
             onClick={handleContinue}
-            className="px-12 py-4 bg-linear-to-r from-cyan-500 to-blue-600 rounded-full text-white font-bold text-md shadow-lg shadow-cyan-500/50 hover:shadow-cyan-500/70 transition-all hover:scale-105"
+            className="px-12 py-4 bg-linear-to-r from-cyan-500 to-blue-600 rounded-full text-white font-bold text-sm shadow-lg shadow-cyan-500/50 hover:shadow-cyan-500/70 transition-all hover:scale-105"
           >
             START COMPATIBILITY TEST
           </button>
