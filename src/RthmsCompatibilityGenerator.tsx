@@ -415,7 +415,7 @@ const RthmsCompatibilityGenerator = () => {
             }
           `}</style>
           
-          <div className="relative w-full" style={{ maxWidth: '420px' }}>
+          <div className="relative w-full" style={{ maxWidth: '460px' }}>
             <div 
               className="relative bg-black rounded-[3rem] shadow-2xl overflow-hidden border border-gray-800 mx-auto" 
               style={{ aspectRatio: '9/19.5', height: '90vh', maxHeight: '90vh' }}
