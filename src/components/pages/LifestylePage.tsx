@@ -24,7 +24,7 @@ export const LifestylePage = ({ person1, person2, lifestyleData }: LifestylePage
       
       {/* Timeline/spectrum visualization */}
       <div className="w-full mb-8 flex-1 flex items-center">
-        <div className="relative h-40 w-full">
+        <div className="relative h-32 w-full">
           {/* Connection lines - rendered first so they're behind */}
           {lifestyleData.overlapping.length > 0 && (
             <>
@@ -35,9 +35,9 @@ export const LifestylePage = ({ person1, person2, lifestyleData }: LifestylePage
           
           {/* Center shared zone */}
           <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
-            <div className="w-28 h-28 rounded-full bg-cyan-500/20 backdrop-blur-sm border-3 border-cyan-400/50 flex flex-col items-center justify-center shadow-lg shadow-cyan-500/30">
-              <div className="text-white text-3xl font-bold">{lifestyleData.overlapping.length}</div>
-              <div className="text-cyan-400 text-xs font-semibold">Shared</div>
+            <div className="w-20 h-20 rounded-full bg-cyan-500/20 backdrop-blur-sm border-3 border-cyan-400/50 flex flex-col items-center justify-center shadow-lg shadow-cyan-500/30">
+              <div className="text-white text-2xl font-bold">{lifestyleData.overlapping.length}</div>
+              <div className="text-cyan-400 text-[10px] font-semibold">Shared</div>
             </div>
           </div>
           
@@ -47,10 +47,10 @@ export const LifestylePage = ({ person1, person2, lifestyleData }: LifestylePage
               {person1.tags.lifestyle.slice(0, 3).map((item, idx) => (
                 <div 
                   key={item} 
-                  className="bg-slate-800/50 backdrop-blur-sm rounded-lg px-3 py-2 flex items-center gap-2 text-white text-xs border border-slate-700/50 animate-slide-in-left"
+                  className="bg-slate-800/50 backdrop-blur-sm rounded-lg px-2 py-1.5 flex items-center gap-1.5 text-white text-[10px] border border-slate-700/50 animate-slide-in-left"
                   style={{ animationDelay: `${idx * 0.1}s` }}
                 >
-                  {getLifestyleIcon(item)}
+                  <span className="text-xs">{getLifestyleIcon(item)}</span>
                   <span className="whitespace-nowrap">{item.split(' ')[0]}</span>
                 </div>
               ))}
@@ -63,11 +63,11 @@ export const LifestylePage = ({ person1, person2, lifestyleData }: LifestylePage
               {person2.tags.lifestyle.slice(0, 3).map((item, idx) => (
                 <div 
                   key={item} 
-                  className="bg-slate-800/50 backdrop-blur-sm rounded-lg px-3 py-2 flex items-center gap-2 text-white text-xs border border-slate-700/50 animate-slide-in-right"
+                  className="bg-slate-800/50 backdrop-blur-sm rounded-lg px-2 py-1.5 flex items-center gap-1.5 text-white text-[10px] border border-slate-700/50 animate-slide-in-right"
                   style={{ animationDelay: `${idx * 0.1}s` }}
                 >
                   <span className="whitespace-nowrap">{item.split(' ')[0]}</span>
-                  {getLifestyleIcon(item)}
+                  <span className="text-xs">{getLifestyleIcon(item)}</span>
                 </div>
               ))}
             </div>
@@ -78,12 +78,12 @@ export const LifestylePage = ({ person1, person2, lifestyleData }: LifestylePage
       {/* Shared interests tags */}
       {lifestyleData.overlapping.length > 0 && (
         <div className="mb-6">
-          <div className="text-cyan-400 font-bold text-sm mb-3 text-center">You Both Vibe With</div>
-          <div className="flex gap-2 justify-center flex-wrap px-4">
+          <div className="text-cyan-400 font-bold text-xs mb-2 text-center">You Both Vibe With</div>
+          <div className="flex gap-1.5 justify-center flex-wrap px-2">
             {lifestyleData.overlapping.map(item => (
-              <div key={item} className="bg-cyan-500/20 backdrop-blur-sm rounded-full px-4 py-2 flex items-center gap-2 border-2 border-cyan-500/30">
-                <div className="text-cyan-400">{getLifestyleIcon(item)}</div>
-                <div className="text-white text-xs font-semibold">{item}</div>
+              <div key={item} className="bg-cyan-500/20 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-1.5 border-2 border-cyan-500/30 whitespace-nowrap">
+                <div className="text-cyan-400 text-xs">{getLifestyleIcon(item)}</div>
+                <div className="text-white text-[10px] font-semibold">{item}</div>
               </div>
             ))}
           </div>

@@ -9,7 +9,9 @@ export const TagInfoPage = ({ onClose }: TagInfoPageProps) => {
   const categoryColors = {
     sleep: 'from-purple-500 to-pink-600',
     activity: 'from-green-500 to-emerald-600',
+    wellness: 'from-teal-500 to-cyan-600',
     food: 'from-orange-500 to-red-600',
+    entertainment: 'from-purple-500 to-indigo-600',
     lifestyle: 'from-blue-500 to-cyan-600'
   };
 

@@ -26,16 +26,15 @@ export const Navigation = ({ currentPage, totalPages, onNext, onReset }: Navigat
       </div>
 
       {/* Let's Go Button - Only show on first page */}
-      {isFirstPage && (
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">
-          <button
-            onClick={onNext}
-            className="px-12 py-4 bg-linear-to-r from-cyan-500 to-blue-600 rounded-full text-white font-bold text-lg shadow-lg shadow-cyan-500/50 hover:shadow-cyan-500/70 transition-all hover:scale-105"
-          >
-            LET'S GO
-          </button>
-        </div>
-      )}
+      <div className={`absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20 transition-opacity duration-200 ${isFirstPage ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        <button
+          onClick={onNext}
+          className="px-12 py-4 bg-linear-to-r from-cyan-500 to-blue-600 rounded-full text-white font-bold text-lg shadow-lg shadow-cyan-500/50 hover:shadow-cyan-500/70 transition-all hover:scale-105"
+          disabled={!isFirstPage}
+        >
+          LET'S GO
+        </button>
+      </div>
 
       <button
         onClick={onReset}

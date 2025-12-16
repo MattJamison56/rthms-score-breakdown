@@ -4,6 +4,7 @@ export interface PersonTags {
   food: string[];
   wellness: string[];
   lifestyle: string[];
+  entertainment: string[];
 }
 
 export interface Person {

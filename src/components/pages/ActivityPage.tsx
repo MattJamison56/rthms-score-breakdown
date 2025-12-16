@@ -28,16 +28,25 @@ export const ActivityPage = ({ person1, person2, activityData }: ActivityPagePro
       
       {/* Column headers */}
       <div className="grid grid-cols-2 gap-4 mb-3">
-        <div className="text-center text-xs font-semibold text-gray-500">
+        <div className="text-center text-[10px] font-semibold text-gray-500">
           You
         </div>
-        <div className="text-center text-xs font-semibold text-gray-500">
+        <div className="text-center text-[10px] font-semibold text-gray-500">
           {person2.name}
         </div>
       </div>
       
       {/* Activity rows */}
-      <div className="flex-1 flex flex-col justify-center gap-3 mb-6 overflow-y-auto">
+      <div className="flex-1 flex flex-col justify-center gap-3 mb-6 overflow-y-auto no-scrollbar">
+        <style>{`
+          .no-scrollbar {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+          }
+          .no-scrollbar::-webkit-scrollbar {
+            display: none;
+          }
+        `}</style>
         {Array.from({ length: maxLength }).map((_, idx) => {
           const person1Activity = person1Activities[idx];
           const person2Activity = person2Activities[idx];
@@ -53,14 +62,14 @@ export const ActivityPage = ({ person1, person2, activityData }: ActivityPagePro
             >
               {/* Person 1 - Left */}
               {person1Activity ? (
-                <div className={`bg-slate-800/50 backdrop-blur-sm rounded-xl px-4 py-3 border transition-all ${
+                <div className={`bg-slate-800/50 backdrop-blur-sm rounded-xl px-3 py-2 border transition-all ${
                   person1IsShared
                     ? 'border-orange-400/60 bg-orange-500/10' 
                     : 'border-slate-700/50'
                 }`}>
-                  <div className="flex items-center gap-2">
-                    <Dumbbell className={`w-5 h-5 shrink-0 ${person1IsShared ? 'text-orange-400' : 'text-gray-400'}`} />
-                    <div className={`text-xs font-semibold ${person1IsShared ? 'text-orange-200' : 'text-white'}`}>
+                  <div className="flex items-center gap-1.5">
+                    <Dumbbell className={`w-3.5 h-3.5 shrink-0 ${person1IsShared ? 'text-orange-400' : 'text-gray-400'}`} />
+                    <div className={`text-[10px] font-semibold ${person1IsShared ? 'text-orange-200' : 'text-white'}`}>
                       {person1Activity}
                     </div>
                   </div>
@@ -71,14 +80,14 @@ export const ActivityPage = ({ person1, person2, activityData }: ActivityPagePro
               
               {/* Person 2 - Right */}
               {person2Activity ? (
-                <div className={`bg-slate-800/50 backdrop-blur-sm rounded-xl px-4 py-3 border transition-all ${
+                <div className={`bg-slate-800/50 backdrop-blur-sm rounded-xl px-3 py-2 border transition-all ${
                   person2IsShared
                     ? 'border-orange-400/60 bg-orange-500/10' 
                     : 'border-slate-700/50'
                 }`}>
-                  <div className="flex items-center gap-2">
-                    <Dumbbell className={`w-5 h-5 shrink-0 ${person2IsShared ? 'text-orange-400' : 'text-gray-400'}`} />
-                    <div className={`text-xs font-semibold ${person2IsShared ? 'text-orange-200' : 'text-white'}`}>
+                  <div className="flex items-center gap-1.5">
+                    <Dumbbell className={`w-3.5 h-3.5 shrink-0 ${person2IsShared ? 'text-orange-400' : 'text-gray-400'}`} />
+                    <div className={`text-[10px] font-semibold ${person2IsShared ? 'text-orange-200' : 'text-white'}`}>
                       {person2Activity}
                     </div>
                   </div>

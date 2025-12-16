@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { Person, PersonTags } from './types/compatibility';
 import { calculateOverlap } from './utils/compatibilityCalculations';
 import { OverallPage } from './components/pages/OverallPage';
@@ -10,40 +10,93 @@ import { LifestylePage } from './components/pages/LifestylePage';
 import { Navigation } from './components/Navigation';
 import { TagSelectionPage } from './components/pages/TagSelectionPage';
 import { CompatibilityReportPage } from './components/pages/CompatibilityReportPage';
+import { ModeSelectionPage } from './components/pages/ModeSelectionPage';
+
+// Helper to ensure all tag categories exist
+const ensureFullTags = (tags: Partial<PersonTags>): PersonTags => {
+  return {
+    sleep: tags.sleep || [],
+    activity: tags.activity || [],
+    food: tags.food || [],
+    wellness: tags.wellness || [],
+    lifestyle: tags.lifestyle || [],
+    entertainment: tags.entertainment || []
+  };
+};
+
+// Helper to validate and clean corrupted localStorage data
+const cleanStorageData = (data: PersonTags): PersonTags => {
+  if (!data || typeof data !== 'object') {
+    return ensureFullTags({});
+  }
+  
+  const cleaned: PersonTags = {
+    sleep: Array.isArray(data.sleep) ? data.sleep : [],
+    activity: Array.isArray(data.activity) ? data.activity : [],
+    food: Array.isArray(data.food) ? data.food : [],
+    wellness: Array.isArray(data.wellness) ? data.wellness : [],
+    lifestyle: Array.isArray(data.lifestyle) ? data.lifestyle : [],
+    entertainment: Array.isArray(data.entertainment) ? data.entertainment : []
+  };
+  
+  // Remove duplicates within each category
+  Object.keys(cleaned).forEach(key => {
+    const category = key as keyof PersonTags;
+    cleaned[category] = Array.from(new Set(cleaned[category]));
+  });
+  
+  return cleaned;
+};
 
 const RthmsCompatibilityGenerator = () => {
-  const [showTagSelection, setShowTagSelection] = useState(true);
+  const [showModeSelection, setShowModeSelection] = useState(true);
+  const [showTagSelection, setShowTagSelection] = useState(false);
+  const [selectedMode, setSelectedMode] = useState<'solo' | 'dating' | 'friendship'>('dating');
   const [currentPage, setCurrentPage] = useState(0);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [person1, setPerson1] = useState<Person>(() => {
     const saved = localStorage.getItem('rthms_person1_tags');
     return {
       name: 'Person 1',
-      tags: saved ? JSON.parse(saved) : { sleep: [], activity: [], food: [], wellness: [], lifestyle: [] }
+      tags: saved ? cleanStorageData(JSON.parse(saved)) : { sleep: [], activity: [], food: [], wellness: [], lifestyle: [], entertainment: [] }
     };
   });
   const [person2, setPerson2] = useState<Person>(() => {
     const saved = localStorage.getItem('rthms_person2_tags');
     return {
       name: 'Person 2',
-      tags: saved ? JSON.parse(saved) : { sleep: [], activity: [], food: [], wellness: [], lifestyle: [] }
+      tags: saved ? cleanStorageData(JSON.parse(saved)) : { sleep: [], activity: [], food: [], wellness: [], lifestyle: [], entertainment: [] }
     };
   });
 
-  // Check if we have saved tags to skip tag selection on initial load
+  // Check if we have saved tags to skip mode/tag selection on initial load
   useEffect(() => {
     const saved1 = localStorage.getItem('rthms_person1_tags');
     const saved2 = localStorage.getItem('rthms_person2_tags');
     if (saved1 && saved2) {
-      const tags1 = JSON.parse(saved1) as PersonTags;
-      const tags2 = JSON.parse(saved2) as PersonTags;
+      const tags1 = cleanStorageData(JSON.parse(saved1));
+      const tags2 = cleanStorageData(JSON.parse(saved2));
       const hasTags = Object.values(tags1).some((arr: string[]) => arr.length > 0) || 
                       Object.values(tags2).some((arr: string[]) => arr.length > 0);
     if (hasTags) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
+      setShowModeSelection(false);
       setShowTagSelection(false);
     }
     }
   }, []);
+
+  const handleModeSelection = (mode: 'solo' | 'dating' | 'friendship') => {
+    // Mode selected, proceed to tag selection
+    setSelectedMode(mode);
+    setShowModeSelection(false);
+    setShowTagSelection(true);
+  };
+
+  const handleBackToModeSelection = () => {
+    setShowTagSelection(false);
+    setShowModeSelection(true);
+  };
 
   const handleTagSelectionComplete = (person1Tags: PersonTags, person2Tags: PersonTags) => {
     setPerson1({ name: 'Person 1', tags: person1Tags });
@@ -179,42 +232,96 @@ const RthmsCompatibilityGenerator = () => {
 
   const nextPage = () => {
     if (currentPage < pages.length - 1) {
-      setCurrentPage(currentPage + 1);
+      const newPage = currentPage + 1;
+      setCurrentPage(newPage);
+      scrollToPage(newPage);
     }
   };
 
   const prevPage = () => {
     if (currentPage > 0) {
-      setCurrentPage(currentPage - 1);
+      const newPage = currentPage - 1;
+      setCurrentPage(newPage);
+      scrollToPage(newPage);
     }
   };
 
-  const handleScreenClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    const target = e.currentTarget;
-    const rect = target.getBoundingClientRect();
-    const clickX = e.clientX - rect.left;
-    const halfWidth = rect.width / 2;
-    
-    if (clickX < halfWidth) {
-      prevPage();
-    } else {
-      nextPage();
+  const scrollToPage = (pageIndex: number) => {
+    if (scrollContainerRef.current) {
+      const container = scrollContainerRef.current;
+      const pageHeight = container.clientHeight;
+      container.scrollTo({
+        top: pageHeight * pageIndex,
+        behavior: 'smooth'
+      });
     }
   };
+
+  // Handle scroll events to update current page
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) {
+      console.log('No scroll container found!');
+      return;
+    }
+
+    console.log('Scroll listener attached to:', container);
+    
+    let scrollTimeout: NodeJS.Timeout;
+    const handleScroll = () => {
+      clearTimeout(scrollTimeout);
+      
+      // Immediate update for responsiveness
+      const scrollTop = container.scrollTop;
+      const pageHeight = container.clientHeight;
+      const newPage = Math.round(scrollTop / pageHeight);
+      console.log('Scroll detected:', { scrollTop, pageHeight, newPage, currentPage });
+      if (newPage !== currentPage && newPage >= 0 && newPage < pages.length) {
+        setCurrentPage(newPage);
+      }
+      
+      // Also set with timeout for snap completion
+      scrollTimeout = setTimeout(() => {
+        const scrollTop = container.scrollTop;
+        const pageHeight = container.clientHeight;
+        const newPage = Math.round(scrollTop / pageHeight);
+        if (newPage !== currentPage && newPage >= 0 && newPage < pages.length) {
+          setCurrentPage(newPage);
+        }
+      }, 50);
+    };
+
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+      clearTimeout(scrollTimeout);
+    };
+  }, [currentPage, pages.length, showTagSelection, showModeSelection]);
 
   return (
     <>
       <div className="min-h-screen bg-black flex items-center justify-center p-4">
-        {showTagSelection ? (
+        {showModeSelection ? (
+          <div className="relative w-full max-w-sm">
+            <div 
+              className="bg-black rounded-[3rem] shadow-2xl overflow-hidden border border-gray-800" 
+              style={{ aspectRatio: '9/19.5', maxHeight: '85vh' }}
+            >
+              <ModeSelectionPage onSelectMode={handleModeSelection} />
+            </div>
+          </div>
+        ) : showTagSelection ? (
           <div className="relative w-full max-w-sm">
             <div 
               className="bg-black rounded-[3rem] shadow-2xl overflow-y-auto border border-gray-800 no-scrollbar" 
-              style={{ aspectRatio: '9/19.5' }}
+              style={{ aspectRatio: '9/19.5', maxHeight: '85vh' }}
             >
               <TagSelectionPage 
                 onComplete={handleTagSelectionComplete}
                 initialPerson1Tags={person1.tags}
                 initialPerson2Tags={person2.tags}
+                mode={selectedMode}
+                onBack={handleBackToModeSelection}
               />
             </div>
           </div>
@@ -284,13 +391,25 @@ const RthmsCompatibilityGenerator = () => {
               animation: slide-in-down 0.5s ease-out forwards;
               opacity: 0;
             }
+            .snap-container {
+              scroll-snap-type: y mandatory;
+              overflow-y: scroll;
+              scrollbar-width: none;
+              -ms-overflow-style: none;
+            }
+            .snap-container::-webkit-scrollbar {
+              display: none;
+            }
+            .snap-page {
+              scroll-snap-align: start;
+              scroll-snap-stop: always;
+            }
           `}</style>
           
           <div className="relative w-full max-w-sm">
             <div 
-              className="bg-black rounded-[3rem] shadow-2xl overflow-hidden border border-gray-800 cursor-pointer" 
-              style={{ aspectRatio: '9/19.5' }}
-              onClick={handleScreenClick}
+              className="relative bg-black rounded-[3rem] shadow-2xl overflow-hidden border border-gray-800" 
+              style={{ aspectRatio: '9/19.5', maxHeight: '85vh' }}
             >
               <Navigation
                 currentPage={currentPage}
@@ -303,7 +422,19 @@ const RthmsCompatibilityGenerator = () => {
                 }}
               />
 
-              {pages[currentPage].render()}
+              <div 
+                ref={scrollContainerRef}
+                className="snap-container h-full w-full"
+              >
+                {pages.map((page, index) => (
+                  <div 
+                    key={index}
+                    className="snap-page h-full w-full"
+                  >
+                    {page.render()}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
           </>

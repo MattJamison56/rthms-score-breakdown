@@ -1,34 +1,74 @@
 import { useState, useEffect } from 'react';
-import { Info } from 'lucide-react';
+import { Info, ArrowLeft } from 'lucide-react';
 import type { PersonTags } from '../../types/compatibility';
 import { ALL_TAGS, hasConflict, MUTUALLY_EXCLUSIVE_GROUPS } from '../../data/allTags';
 import { TagInfoPage } from './TagInfoPage';
+
+// Helper to ensure all tag categories exist
+const ensureFullTags = (tags: Partial<PersonTags>): PersonTags => {
+  return {
+    sleep: tags.sleep || [],
+    activity: tags.activity || [],
+    food: tags.food || [],
+    wellness: tags.wellness || [],
+    lifestyle: tags.lifestyle || [],
+    entertainment: tags.entertainment || []
+  };
+};
+
+// Helper to validate and clean corrupted localStorage data
+const cleanStorageData = (data: PersonTags): PersonTags => {
+  if (!data || typeof data !== 'object') {
+    return ensureFullTags({});
+  }
+  
+  const cleaned: PersonTags = {
+    sleep: Array.isArray(data.sleep) ? data.sleep : [],
+    activity: Array.isArray(data.activity) ? data.activity : [],
+    food: Array.isArray(data.food) ? data.food : [],
+    wellness: Array.isArray(data.wellness) ? data.wellness : [],
+    lifestyle: Array.isArray(data.lifestyle) ? data.lifestyle : [],
+    entertainment: Array.isArray(data.entertainment) ? data.entertainment : []
+  };
+  
+  // Remove duplicates within each category
+  Object.keys(cleaned).forEach(key => {
+    const category = key as keyof PersonTags;
+    cleaned[category] = Array.from(new Set(cleaned[category]));
+  });
+  
+  return cleaned;
+};
 
 interface TagSelectionPageProps {
   onComplete: (person1Tags: PersonTags, person2Tags: PersonTags) => void;
   initialPerson1Tags?: PersonTags;
   initialPerson2Tags?: PersonTags;
+  mode?: 'solo' | 'dating' | 'friendship';
+  onBack?: () => void;
 }
 
-export const TagSelectionPage = ({ onComplete, initialPerson1Tags, initialPerson2Tags }: TagSelectionPageProps) => {
+export const TagSelectionPage = ({ onComplete, initialPerson1Tags, initialPerson2Tags, mode = 'dating', onBack }: TagSelectionPageProps) => {
   const [selectedPerson, setSelectedPerson] = useState<1 | 2>(1);
   const [showInfo, setShowInfo] = useState(false);
   const [person1Tags, setPerson1Tags] = useState<PersonTags>(
-    initialPerson1Tags || {
+    initialPerson1Tags ? cleanStorageData(initialPerson1Tags) : {
       sleep: [],
       activity: [],
       food: [],
       wellness: [],
-      lifestyle: []
+      lifestyle: [],
+      entertainment: []
     }
   );
   const [person2Tags, setPerson2Tags] = useState<PersonTags>(
-    initialPerson2Tags || {
+    initialPerson2Tags ? cleanStorageData(initialPerson2Tags) : {
       sleep: [],
       activity: [],
       food: [],
       wellness: [],
-      lifestyle: []
+      lifestyle: [],
+      entertainment: []
     }
   );
 
@@ -41,7 +81,7 @@ export const TagSelectionPage = ({ onComplete, initialPerson1Tags, initialPerson
   const currentTags = selectedPerson === 1 ? person1Tags : person2Tags;
   const setCurrentTags = selectedPerson === 1 ? setPerson1Tags : setPerson2Tags;
 
-  const allCurrentTags = [...currentTags.sleep, ...currentTags.activity, ...currentTags.food, ...currentTags.lifestyle];
+  const allCurrentTags = [...currentTags.sleep, ...currentTags.activity, ...currentTags.food, ...currentTags.wellness, ...currentTags.lifestyle, ...currentTags.entertainment];
 
   const toggleTag = (category: keyof PersonTags, tag: string) => {
     setCurrentTags(prev => {
@@ -87,7 +127,8 @@ export const TagSelectionPage = ({ onComplete, initialPerson1Tags, initialPerson
       activity: [],
       food: [],
       wellness: [],
-      lifestyle: []
+      lifestyle: [],
+      entertainment: []
     };
     setPerson1Tags(emptyTags);
     setPerson2Tags(emptyTags);
@@ -96,7 +137,9 @@ export const TagSelectionPage = ({ onComplete, initialPerson1Tags, initialPerson
   const categoryColors = {
     sleep: 'from-purple-500 to-pink-600',
     activity: 'from-green-500 to-emerald-600',
+    wellness: 'from-teal-500 to-cyan-600',
     food: 'from-orange-500 to-red-600',
+    entertainment: 'from-purple-500 to-indigo-600',
     lifestyle: 'from-blue-500 to-cyan-600'
   };
 
@@ -106,9 +149,9 @@ export const TagSelectionPage = ({ onComplete, initialPerson1Tags, initialPerson
     const grouped: { group: string[] | null; tags: string[] }[] = [];
     const processedTags = new Set<string>();
 
-    // First, add mutually exclusive groups
+    // First, add mutually exclusive groups (ensuring no duplicates)
     MUTUALLY_EXCLUSIVE_GROUPS.forEach(group => {
-      const tagsInCategory = group.filter((tag: string) => categoryTags.includes(tag));
+      const tagsInCategory = group.filter((tag: string) => categoryTags.includes(tag) && !processedTags.has(tag));
       if (tagsInCategory.length > 0) {
         grouped.push({ group, tags: tagsInCategory });
         tagsInCategory.forEach((tag: string) => processedTags.add(tag));
@@ -140,7 +183,17 @@ export const TagSelectionPage = ({ onComplete, initialPerson1Tags, initialPerson
         }
       `}</style>
       <div className="max-w-4xl mx-auto">
-        <div className="flex justify-center mb-6">
+        <div className="flex justify-between items-center mb-6">
+          {onBack && (
+            <button
+              onClick={onBack}
+              className="p-3 bg-slate-800 hover:bg-slate-700 rounded-full text-gray-300 transition-all hover:scale-105"
+              title="Back to mode selection"
+            >
+              <ArrowLeft size={24} />
+            </button>
+          )}
+          <div className="flex-1"></div>
           <button
             onClick={() => setShowInfo(true)}
             className="p-3 bg-slate-800 hover:bg-slate-700 rounded-full text-gray-300 transition-all hover:scale-105"
@@ -156,7 +209,8 @@ export const TagSelectionPage = ({ onComplete, initialPerson1Tags, initialPerson
           Select tags for each person to test different compatibility combinations
         </p>
 
-        {/* Person Toggle */}
+        {/* Person Toggle - Only show if not solo mode */}
+        {mode !== 'solo' && (
         <div className="flex justify-center gap-4 mb-8">
           <button
             onClick={() => setSelectedPerson(1)}
@@ -167,9 +221,9 @@ export const TagSelectionPage = ({ onComplete, initialPerson1Tags, initialPerson
             }`}
           >
             Person 1
-            {person1Tags.sleep.length + person1Tags.activity.length + person1Tags.food.length + person1Tags.lifestyle.length > 0 && (
+            {person1Tags.sleep.length + person1Tags.activity.length + person1Tags.food.length + person1Tags.wellness.length + person1Tags.lifestyle.length + person1Tags.entertainment.length > 0 && (
               <span className="ml-2 px-2 py-0.5 bg-white/20 rounded-full text-xs">
-                {person1Tags.sleep.length + person1Tags.activity.length + person1Tags.food.length + person1Tags.lifestyle.length}
+                {person1Tags.sleep.length + person1Tags.activity.length + person1Tags.food.length + person1Tags.wellness.length + person1Tags.lifestyle.length + person1Tags.entertainment.length}
               </span>
             )}
           </button>
@@ -182,13 +236,14 @@ export const TagSelectionPage = ({ onComplete, initialPerson1Tags, initialPerson
             }`}
           >
             Person 2
-            {person2Tags.sleep.length + person2Tags.activity.length + person2Tags.food.length + person2Tags.lifestyle.length > 0 && (
+            {person2Tags.sleep.length + person2Tags.activity.length + person2Tags.food.length + person2Tags.wellness.length + person2Tags.lifestyle.length + person2Tags.entertainment.length > 0 && (
               <span className="ml-2 px-2 py-0.5 bg-white/20 rounded-full text-xs">
-                {person2Tags.sleep.length + person2Tags.activity.length + person2Tags.food.length + person2Tags.lifestyle.length}
+                {person2Tags.sleep.length + person2Tags.activity.length + person2Tags.food.length + person2Tags.wellness.length + person2Tags.lifestyle.length + person2Tags.entertainment.length}
               </span>
             )}
           </button>
         </div>
+        )}
 
         {/* Tag Categories */}
         <div className="space-y-8">
@@ -201,12 +256,18 @@ export const TagSelectionPage = ({ onComplete, initialPerson1Tags, initialPerson
                   {category}
                 </h2>
                 <div className="space-y-4">
-                  {groupedTags.map((section, idx) => (
-                    <div key={idx}>
-                      {section.group && (
-                        <div className="text-xs text-gray-500 mb-2 ml-1">Choose one:</div>
-                      )}
-                      <div className="flex flex-wrap gap-3">
+                  {groupedTags.map((section, idx) => {
+                    // Check if this group is actually mutually exclusive
+                    const isMutuallyExclusive = section.group && MUTUALLY_EXCLUSIVE_GROUPS.some(
+                      group => group.some(tag => section.tags.includes(tag))
+                    );
+                    
+                    return (
+                      <div key={idx}>
+                        <div className="text-xs text-gray-500 mb-2 ml-1">
+                        {isMutuallyExclusive ? 'Choose one:' : 'Choose any:'}
+                        </div>
+                        <div className="flex flex-wrap gap-3">
                         {section.tags.map(tag => {
                           const selected = isTagSelected(category, tag);
                           const disabled = !selected && isTagDisabled(tag);
@@ -230,7 +291,8 @@ export const TagSelectionPage = ({ onComplete, initialPerson1Tags, initialPerson
                         })}
                       </div>
                     </div>
-                  ))}
+                  );
+                  })}
                 </div>
               </div>
             );
