@@ -36,7 +36,6 @@ export const CompatibilityReportPage = ({ person1, person2 }: CompatibilityRepor
       `}</style>
       <div className="px-6 pt-8 pb-4">
         <h1 className="text-2xl font-bold text-white text-center">⚡️ Compatibility Reading</h1>
-        <p className="text-sm text-gray-400 text-center mt-2">(Culture Index Edition, Co–Star vibes)</p>
       </div>
 
       <div className="flex-1 overflow-y-auto px-6 pb-8 no-scrollbar">

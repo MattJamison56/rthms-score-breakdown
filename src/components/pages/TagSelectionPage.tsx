@@ -309,7 +309,7 @@ export const TagSelectionPage = ({ onComplete, initialPerson1Tags, initialPerson
           </button>
           <button
             onClick={handleContinue}
-            className="px-12 py-4 bg-linear-to-r from-cyan-500 to-blue-600 rounded-full text-white font-bold text-sm shadow-lg shadow-cyan-500/50 hover:shadow-cyan-500/70 transition-all hover:scale-105"
+            className="px-6 py-2 bg-linear-to-r from-cyan-500 to-blue-600 rounded-full text-white font-bold text-sm shadow-lg shadow-cyan-500/50 hover:shadow-cyan-500/70 transition-all hover:scale-105"
           >
             START COMPATIBILITY TEST
           </button>

@@ -19,7 +19,7 @@ export const SleepPage = ({ person1, person2, sleepData }: SleepPageProps) => {
         <div className="w-16 h-16 rounded-full bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-500/50">
           <Moon className="w-8 h-8 text-white" />
         </div>
-        <h2 className="text-2xl font-bold text-white mb-2">Sleep Patterns</h2>
+        <h2 className="text-xl font-bold text-white mb-2">Sleep Patterns</h2>
         <div className="text-5xl font-bold text-transparent bg-clip-text bg-linear-to-r from-indigo-400 to-purple-500">
           {sleepData.percentage}%
         </div>
@@ -29,21 +29,21 @@ export const SleepPage = ({ person1, person2, sleepData }: SleepPageProps) => {
       <div className="flex-1 flex items-center justify-center mb-8">
         <div className="flex items-center gap-8">
           <div className="text-center">
-            <div className="w-28 h-28 bg-linear-to-br from-yellow-500/20 to-orange-500/20 backdrop-blur-sm rounded-full flex items-center justify-center mb-3 border-2 border-yellow-500/30">
+            <div className="w-24 h-24 bg-linear-to-br from-yellow-500/20 to-orange-500/20 backdrop-blur-sm rounded-full flex items-center justify-center mb-3 border-2 border-yellow-500/30">
               {p1IsEarly ? <Sun className="w-14 h-14 text-yellow-400" /> : <Moon className="w-14 h-14 text-indigo-300" />}
             </div>
             <div className="text-white font-bold text-sm">Person 1</div>
-            <div className="text-gray-400 text-xs mt-1">{person1.tags.sleep[0]}</div>
+            <div className="text-gray-400 text-xs mt-1 whitespace-nowrap">{person1.tags.sleep[0]}</div>
           </div>
           
           <div className="text-3xl text-gray-600">vs</div>
           
           <div className="text-center">
-            <div className="w-28 h-28 bg-linear-to-br from-indigo-500/20 to-purple-500/20 backdrop-blur-sm rounded-full flex items-center justify-center mb-3 border-2 border-indigo-500/30">
+            <div className="w-24 h-24 bg-linear-to-br from-indigo-500/20 to-purple-500/20 backdrop-blur-sm rounded-full flex items-center justify-center mb-3 border-2 border-indigo-500/30">
               {p2IsNight ? <Moon className="w-14 h-14 text-indigo-300" /> : <Sun className="w-14 h-14 text-yellow-400" />}
             </div>
             <div className="text-white font-bold text-sm">Person 2</div>
-            <div className="text-gray-400 text-xs mt-1">{person2.tags.sleep[0]}</div>
+            <div className="text-gray-400 text-xs mt-1 whitespace-nowrap">{person2.tags.sleep[0]}</div>
           </div>
         </div>
       </div>

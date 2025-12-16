@@ -306,6 +306,7 @@ const RthmsCompatibilityGenerator = () => {
           position: fixed;
           width: 100%;
           height: 100%;
+          font-size: 95%;
         }
       `}</style>
       <div className="fixed inset-0 bg-black flex items-center justify-center">
@@ -313,7 +314,7 @@ const RthmsCompatibilityGenerator = () => {
           <div className="relative w-full" style={{ maxWidth: '420px' }}>
             <div 
               className="bg-black rounded-[3rem] shadow-2xl overflow-hidden border border-gray-800 mx-auto" 
-              style={{ aspectRatio: '9/19.5', height: '95vh', maxHeight: '95vh' }}
+              style={{ aspectRatio: '9/19.5', height: '90vh', maxHeight: '90vh' }}
             >
               <ModeSelectionPage onSelectMode={handleModeSelection} />
             </div>
@@ -322,7 +323,7 @@ const RthmsCompatibilityGenerator = () => {
           <div className="relative w-full" style={{ maxWidth: '420px' }}>
             <div 
               className="bg-black rounded-[3rem] shadow-2xl overflow-y-auto border border-gray-800 no-scrollbar mx-auto" 
-              style={{ aspectRatio: '9/19.5', height: '95vh', maxHeight: '95vh' }}
+              style={{ aspectRatio: '9/19.5', height: '90vh', maxHeight: '90vh' }}
             >
               <TagSelectionPage 
                 onComplete={handleTagSelectionComplete}
@@ -417,7 +418,7 @@ const RthmsCompatibilityGenerator = () => {
           <div className="relative w-full" style={{ maxWidth: '420px' }}>
             <div 
               className="relative bg-black rounded-[3rem] shadow-2xl overflow-hidden border border-gray-800 mx-auto" 
-              style={{ aspectRatio: '9/19.5', height: '95vh', maxHeight: '95vh' }}
+              style={{ aspectRatio: '9/19.5', height: '90vh', maxHeight: '90vh' }}
             >
               <Navigation
                 currentPage={currentPage}

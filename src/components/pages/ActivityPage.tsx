@@ -20,7 +20,7 @@ export const ActivityPage = ({ person1, person2, activityData }: ActivityPagePro
         <div className="w-16 h-16 rounded-full bg-linear-to-br from-orange-500 to-red-600 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-orange-500/50">
           <Dumbbell className="w-8 h-8 text-white" />
         </div>
-        <h2 className="text-2xl font-bold text-white mb-2">Activity Level</h2>
+        <h2 className="text-xl font-bold text-white mb-2">Activity Level</h2>
         <div className="text-5xl font-bold text-transparent bg-clip-text bg-linear-to-r from-orange-400 to-red-500">
           {activityData.percentage}%
         </div>
@@ -37,7 +37,7 @@ export const ActivityPage = ({ person1, person2, activityData }: ActivityPagePro
       </div>
       
       {/* Activity rows */}
-      <div className="flex-1 flex flex-col justify-center gap-3 mb-6 overflow-y-auto no-scrollbar">
+      <div className="flex-1 flex flex-col gap-3 mb-6 overflow-y-auto no-scrollbar">
         <style>{`
           .no-scrollbar {
             scrollbar-width: none;
@@ -57,7 +57,7 @@ export const ActivityPage = ({ person1, person2, activityData }: ActivityPagePro
           return (
             <div 
               key={idx} 
-              className="grid grid-cols-2 gap-4 animate-slide-in-down"
+              className="grid grid-cols-2 gap-2 animate-slide-in-down"
               style={{ animationDelay: `${idx * 0.15}s` }}
             >
               {/* Person 1 - Left */}
