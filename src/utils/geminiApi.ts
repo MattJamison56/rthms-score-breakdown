@@ -44,8 +44,8 @@ export const generateCompatibilitySuggestion = async (
     });
 
     const text = response.text || "No suggestion generated.";
-    // Only hard-cap at 200 chars to match the prompt
-    return text.length > 200 ? `${text.slice(0, 197)}...` : text;
+    // Only hard-cap at 220 chars to match the prompt
+    return text.length > 220 ? `${text.slice(0, 217)}...` : text;
   } catch (error) {
     console.error("Error generating suggestion:", error);
     return "We couldn't generate a custom suggestion right now, but based on your tags, you likely have some interesting overlaps to explore!";
