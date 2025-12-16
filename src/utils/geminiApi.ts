@@ -36,7 +36,7 @@ export const generateCompatibilitySuggestion = async (
       Analyze compatibility for category: "${category}".
       Person 1 Tags: ${JSON.stringify(person1.tags)}
       Person 2 Tags: ${JSON.stringify(person2.tags)}
-      Respond in under 200 characters.
+      Important that you respond in under 200 characters.
       Write as if talking to Person 1, in second person.
       Explain what makes you two click in this category, note one friendly difference, and ${activityMap[mode]} you both might enjoy.
       Keep it warm, upbeat, and constructive. ${mode === 'dating' ? 'Add a hint of romance.' : mode === 'friendship' ? 'Keep it fun and supportive.' : ''}
@@ -44,8 +44,8 @@ export const generateCompatibilitySuggestion = async (
     });
 
     const text = response.text || "No suggestion generated.";
-    // Only hard-cap at 220 chars to match the prompt
-    return text.length > 220 ? `${text.slice(0, 217)}...` : text;
+    // Only hard-cap at 250 chars to match the prompt
+    return text.length > 250 ? `${text.slice(0, 247)}...` : text;
   } catch (error) {
     console.error("Error generating suggestion:", error);
     return "We couldn't generate a custom suggestion right now, but based on your tags, you likely have some interesting overlaps to explore!";
