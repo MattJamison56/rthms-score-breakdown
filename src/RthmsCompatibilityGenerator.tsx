@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import type { Person, PersonTags } from './types/compatibility';
 import { calculateOverlap } from './utils/compatibilityCalculations';
 import { OverallPage } from './components/pages/OverallPage';
@@ -51,7 +51,10 @@ const cleanStorageData = (data: PersonTags): PersonTags => {
 const RthmsCompatibilityGenerator = () => {
   const [showModeSelection, setShowModeSelection] = useState(true);
   const [showTagSelection, setShowTagSelection] = useState(false);
-  const [selectedMode, setSelectedMode] = useState<'solo' | 'dating' | 'friendship'>('dating');
+  const [selectedMode, setSelectedMode] = useState<'solo' | 'dating' | 'friendship'>(() => {
+    const saved = localStorage.getItem('rthms_selected_mode');
+    return (saved as 'solo' | 'dating' | 'friendship') || 'dating';
+  });
   const [currentPage, setCurrentPage] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [person1, setPerson1] = useState<Person>(() => {
@@ -69,11 +72,13 @@ const RthmsCompatibilityGenerator = () => {
     };
   });
 
-  // Check if we have saved tags to skip mode/tag selection on initial load
+  // Check if we have saved tags AND mode to skip mode/tag selection on initial load
   useEffect(() => {
     const saved1 = localStorage.getItem('rthms_person1_tags');
     const saved2 = localStorage.getItem('rthms_person2_tags');
-    if (saved1 && saved2) {
+    const savedMode = localStorage.getItem('rthms_selected_mode');
+    
+    if (saved1 && saved2 && savedMode) {
       const tags1 = cleanStorageData(JSON.parse(saved1));
       const tags2 = cleanStorageData(JSON.parse(saved2));
       const hasTags = Object.values(tags1).some((arr: string[]) => arr.length > 0) || 
@@ -87,8 +92,10 @@ const RthmsCompatibilityGenerator = () => {
   }, []);
 
   const handleModeSelection = (mode: 'solo' | 'dating' | 'friendship') => {
-    // Mode selected, proceed to tag selection
+    // Mode selected, save and proceed to tag selection
+    console.log('Mode selected:', mode);
     setSelectedMode(mode);
+    localStorage.setItem('rthms_selected_mode', mode);
     setShowModeSelection(false);
     setShowTagSelection(true);
   };
@@ -115,7 +122,9 @@ const RthmsCompatibilityGenerator = () => {
   const foodData = calculateOverlap(person1.tags.food, person2.tags.food);
   const lifestyleData = calculateOverlap(person1.tags.lifestyle, person2.tags.lifestyle);
 
-  const pages = [
+  console.log('Current selectedMode for AI:', selectedMode);
+
+  const pages = useMemo(() => [
     {
       type: 'overall',
       title: 'Overall Match',
@@ -143,6 +152,7 @@ const RthmsCompatibilityGenerator = () => {
           hoverBorderColor="hover:border-purple-500/50"
           person1={person1}
           person2={person2}
+          mode={selectedMode}
         />
       )
     },
@@ -168,6 +178,7 @@ const RthmsCompatibilityGenerator = () => {
           hoverBorderColor="hover:border-emerald-500/50"
           person1={person1}
           person2={person2}
+          mode={selectedMode}
         />
       )
     },
@@ -193,6 +204,7 @@ const RthmsCompatibilityGenerator = () => {
           hoverBorderColor="hover:border-orange-500/50"
           person1={person1}
           person2={person2}
+          mode={selectedMode}
         />
       )
     },
@@ -218,6 +230,7 @@ const RthmsCompatibilityGenerator = () => {
           hoverBorderColor="hover:border-cyan-500/50"
           person1={person1}
           person2={person2}
+          mode={selectedMode}
         />
       )
     },
@@ -225,10 +238,10 @@ const RthmsCompatibilityGenerator = () => {
       type: 'final-report',
       title: 'Compatibility Reading',
       render: () => (
-        <CompatibilityReportPage person1={person1} person2={person2} />
+        <CompatibilityReportPage person1={person1} person2={person2} mode={selectedMode} />
       )
     }
-  ];
+  ], [selectedMode, person1, person2, overallOverlap, sleepData, activityData, foodData, lifestyleData]);
 
   const nextPage = () => {
     if (currentPage < pages.length - 1) {
@@ -261,11 +274,8 @@ const RthmsCompatibilityGenerator = () => {
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) {
-      console.log('No scroll container found!');
       return;
     }
-
-    console.log('Scroll listener attached to:', container);
     
     let scrollTimeout: NodeJS.Timeout;
     const handleScroll = () => {
@@ -275,7 +285,6 @@ const RthmsCompatibilityGenerator = () => {
       const scrollTop = container.scrollTop;
       const pageHeight = container.clientHeight;
       const newPage = Math.round(scrollTop / pageHeight);
-      console.log('Scroll detected:', { scrollTop, pageHeight, newPage, currentPage });
       if (newPage !== currentPage && newPage >= 0 && newPage < pages.length) {
         setCurrentPage(newPage);
       }
@@ -314,7 +323,7 @@ const RthmsCompatibilityGenerator = () => {
           <div className="relative w-full" style={{ maxWidth: '460px' }}>
             <div 
               className="bg-black rounded-[3rem] shadow-2xl overflow-hidden border border-gray-800 mx-auto" 
-              style={{ height: '90vh', maxHeight: '90vh' }}
+              style={{ maxWidth: '340px', height: '90vh', maxHeight: '90vh' }}
             >
               <ModeSelectionPage onSelectMode={handleModeSelection} />
             </div>
@@ -323,7 +332,7 @@ const RthmsCompatibilityGenerator = () => {
           <div className="relative w-full" style={{ maxWidth: '460px' }}>
             <div 
               className="bg-black rounded-[3rem] shadow-2xl overflow-y-auto border border-gray-800 no-scrollbar mx-auto" 
-              style={{ height: '90vh', maxHeight: '90vh' }}
+              style={{ maxWidth: '340px',height: '90vh', maxHeight: '90vh' }}
             >
               <TagSelectionPage 
                 onComplete={handleTagSelectionComplete}

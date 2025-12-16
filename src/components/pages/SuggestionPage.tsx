@@ -16,6 +16,7 @@ interface SuggestionPageProps {
   hoverBorderColor: string;
   person1: Person;
   person2: Person;
+  mode: 'solo' | 'dating' | 'friendship';
 }
 
 export const SuggestionPage = ({ 
@@ -27,7 +28,8 @@ export const SuggestionPage = ({
   accentColor,
   hoverBorderColor,
   person1,
-  person2
+  person2,
+  mode
 }: SuggestionPageProps) => {
   const [suggestion, setSuggestion] = useState<string>("");
   const [ideas, setIdeas] = useState<string[]>([]);
@@ -35,23 +37,24 @@ export const SuggestionPage = ({
   const [ideasLoading, setIdeasLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    console.log(`SuggestionPage (${category}) calling API with mode:`, mode);
     const fetchSuggestion = async () => {
       setLoading(true);
-      const text = await generateCompatibilitySuggestion(category, person1, person2);
+      const text = await generateCompatibilitySuggestion(category, person1, person2, mode);
       setSuggestion(text);
       setLoading(false);
     };
 
     const fetchIdeas = async () => {
       setIdeasLoading(true);
-      const list = await generateShortIdeas(category, person1, person2);
+      const list = await generateShortIdeas(category, person1, person2, mode);
       setIdeas(list);
       setIdeasLoading(false);
     };
 
     fetchSuggestion();
     fetchIdeas();
-  }, [category, person1, person2]);
+  }, [category, person1, person2, mode]);
 
   return (
     <div className={`h-full bg-linear-to-br ${gradientFrom} ${gradientVia} to-slate-900 overflow-y-auto relative`}>

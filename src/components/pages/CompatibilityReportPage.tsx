@@ -6,22 +6,23 @@ import { generateCompatibilityReport, type CompatibilityReport } from '../../uti
 interface CompatibilityReportPageProps {
   person1: Person;
   person2: Person;
+  mode: 'solo' | 'dating' | 'friendship';
 }
 
-export const CompatibilityReportPage = ({ person1, person2 }: CompatibilityReportPageProps) => {
+export const CompatibilityReportPage = ({ person1, person2, mode }: CompatibilityReportPageProps) => {
   const [report, setReport] = useState<CompatibilityReport | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchReport = async () => {
       setLoading(true);
-      const data = await generateCompatibilityReport(person1, person2);
+      const data = await generateCompatibilityReport(person1, person2, mode);
       setReport(data);
       setLoading(false);
     };
 
     fetchReport();
-  }, [person1, person2]);
+  }, [person1, person2, mode]);
 
   return (
     <div className="h-full bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-gray-100 flex flex-col">
