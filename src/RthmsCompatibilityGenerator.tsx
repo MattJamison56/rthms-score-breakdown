@@ -300,21 +300,29 @@ const RthmsCompatibilityGenerator = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-black flex items-center justify-center p-4">
+      <style>{`
+        body {
+          overflow: hidden;
+          position: fixed;
+          width: 100%;
+          height: 100%;
+        }
+      `}</style>
+      <div className="fixed inset-0 bg-black flex items-center justify-center">
         {showModeSelection ? (
-          <div className="relative w-full max-w-sm">
+          <div className="relative w-full" style={{ maxWidth: '420px' }}>
             <div 
-              className="bg-black rounded-[3rem] shadow-2xl overflow-hidden border border-gray-800" 
-              style={{ aspectRatio: '9/19.5', maxHeight: '85vh' }}
+              className="bg-black rounded-[3rem] shadow-2xl overflow-hidden border border-gray-800 mx-auto" 
+              style={{ aspectRatio: '9/19.5', height: '95vh', maxHeight: '95vh' }}
             >
               <ModeSelectionPage onSelectMode={handleModeSelection} />
             </div>
           </div>
         ) : showTagSelection ? (
-          <div className="relative w-full max-w-sm">
+          <div className="relative w-full" style={{ maxWidth: '420px' }}>
             <div 
-              className="bg-black rounded-[3rem] shadow-2xl overflow-y-auto border border-gray-800 no-scrollbar" 
-              style={{ aspectRatio: '9/19.5', maxHeight: '85vh' }}
+              className="bg-black rounded-[3rem] shadow-2xl overflow-y-auto border border-gray-800 no-scrollbar mx-auto" 
+              style={{ aspectRatio: '9/19.5', height: '95vh', maxHeight: '95vh' }}
             >
               <TagSelectionPage 
                 onComplete={handleTagSelectionComplete}
@@ -406,10 +414,10 @@ const RthmsCompatibilityGenerator = () => {
             }
           `}</style>
           
-          <div className="relative w-full max-w-sm">
+          <div className="relative w-full" style={{ maxWidth: '420px' }}>
             <div 
-              className="relative bg-black rounded-[3rem] shadow-2xl overflow-hidden border border-gray-800" 
-              style={{ aspectRatio: '9/19.5', maxHeight: '85vh' }}
+              className="relative bg-black rounded-[3rem] shadow-2xl overflow-hidden border border-gray-800 mx-auto" 
+              style={{ aspectRatio: '9/19.5', height: '95vh', maxHeight: '95vh' }}
             >
               <Navigation
                 currentPage={currentPage}
