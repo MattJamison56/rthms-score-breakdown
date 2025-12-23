@@ -133,52 +133,66 @@ export const generateCompatibilityReport = async (
       7) Final Friendship Verdict
     `
     : `
-      1) Overall Energy
-      2) Personal Strengths
-      3) Activity Preferences
-      4) Communication Style
-      5) Work & Lifestyle Balance
-      6) Emotional Wellbeing
-      7) Growth Opportunities
+      1) Overall Wellness Energy
+      2) Sleep & Recovery Patterns
+      3) Activity & Fitness Level
+      4) Nutrition & Food Choices
+      5) Lifestyle & Social Balance
+      6) Growth Opportunities
+      7) Personal Path Forward
     `;
   const fallback: CompatibilityReport = {
-    headline: `${person1.name} + ${person2.name} Compatibility Reading`,
-    subheadline: "High-voltage synergy. Scroll for sections.",
+    headline: mode === 'solo' ? 'Your Personal Wellness Report' : `${person1.name} + ${person2.name} Compatibility Reading`,
+    subheadline: mode === 'solo' ? 'Insights into your unique lifestyle patterns' : "High-voltage synergy. Scroll for sections.",
     sections: [
       {
-        emoji: "⚡️",
-        title: "Overall Energy",
-        body: "Big vision meets bold execution. You both move fast and spark momentum together."
+        emoji: mode === 'solo' ? "🌟" : "⚡️",
+        title: mode === 'solo' ? "Your Energy" : "Overall Energy",
+        body: mode === 'solo' 
+          ? "You bring a unique blend of habits and preferences to your daily life. Your patterns show room for growth and celebration."
+          : "Big vision meets bold execution. You both move fast and spark momentum together."
       },
       {
-        emoji: "❤️",
-        title: "Friendship",
-        body: "Two yes-people to the same chaos; you hype each other and keep things exciting."
+        emoji: mode === 'solo' ? "😴" : "❤️",
+        title: mode === 'solo' ? "Sleep Patterns" : "Friendship",
+        body: mode === 'solo'
+          ? "Your sleep routine tells a story. Whether you're crushing it or need work, awareness is the first step."
+          : "Two yes-people to the same chaos; you hype each other and keep things exciting."
       },
       {
-        emoji: "💼",
-        title: "Business",
-        body: "Visionary + accelerator duo; add a detail-oriented partner to keep the train on track."
+        emoji: mode === 'solo' ? "💪" : "💼",
+        title: mode === 'solo' ? "Activity Level" : "Business",
+        body: mode === 'solo'
+          ? "Movement is medicine. Your activity tags reveal your relationship with fitness and energy."
+          : "Visionary + accelerator duo; add a detail-oriented partner to keep the train on track."
       },
       {
-        emoji: "🧠",
-        title: "Communication",
-        body: "Fast, persuasive, shorthand lightning. Remember others may need more context."
+        emoji: mode === 'solo' ? "🥗" : "🧠",
+        title: mode === 'solo' ? "Nutrition" : "Communication",
+        body: mode === 'solo'
+          ? "Food fuels everything. Your choices reflect your values, convenience needs, and health priorities."
+          : "Fast, persuasive, shorthand lightning. Remember others may need more context."
       },
       {
-        emoji: "🚀",
-        title: "Work Style",
-        body: "Hate routine, love autonomy, thrive under pressure, delegate details, move fast."
+        emoji: mode === 'solo' ? "🏠" : "🚀",
+        title: mode === 'solo' ? "Lifestyle Balance" : "Work Style",
+        body: mode === 'solo'
+          ? "How you spend your time reveals what you value. Social butterfly or homebody, you do you."
+          : "Hate routine, love autonomy, thrive under pressure, delegate details, move fast."
       },
       {
-        emoji: "🪬",
-        title: "Emotional",
-        body: "One brings grounding, the other clarity. Works if you both stay present when tense."
+        emoji: mode === 'solo' ? "🎯" : "🪬",
+        title: mode === 'solo' ? "Growth Areas" : "Emotional",
+        body: mode === 'solo'
+          ? "Every profile has potential. Focus on one category at a time and watch the compound effect."
+          : "One brings grounding, the other clarity. Works if you both stay present when tense."
       },
       {
         emoji: "✨",
-        title: "Verdict",
-        body: "High-voltage synergy — friends, partners, collaborators. The universe approves."
+        title: mode === 'solo' ? "Your Path" : "Verdict",
+        body: mode === 'solo'
+          ? "You're on a journey of self-optimization. Small daily wins create massive long-term transformation."
+          : "High-voltage synergy — friends, partners, collaborators. The universe approves."
       }
     ]
   };
@@ -238,5 +252,77 @@ export const generateCompatibilityReport = async (
   } catch (error) {
     console.error("Error generating compatibility report:", error);
     return fallback;
+  }
+};
+
+// Solo mode AI functions
+export const generateSoloInsights = async (
+  category: string,
+  person: Person
+): Promise<string> => {
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: `
+      You are a personal wellness coach analyzing someone's ${category} habits.
+      Person Tags: ${JSON.stringify(person.tags)}
+      
+      Based on their ${category} tags, provide a personalized insight (under 200 characters).
+      Be encouraging, specific to their tags, and offer one key observation about their ${category} patterns.
+      Write in second person ("You..."). Be warm and motivational.
+    `,
+    });
+
+    const text = response.text || "Your profile shows interesting patterns in this area!";
+    return text.length > 200 ? `${text.slice(0, 197)}...` : text;
+  } catch (error) {
+    console.error("Error generating solo insight:", error);
+    return `Your ${category} habits show unique patterns. Let's explore ways to optimize them!`;
+  }
+};
+
+export const generateSoloActionItems = async (
+  category: string,
+  person: Person
+): Promise<string[]> => {
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: `
+      You are a personal coach creating action items for someone's ${category} improvement.
+      Person Tags: ${JSON.stringify(person.tags)}
+      
+      Create 3 specific, actionable steps they can take to improve or maintain their ${category} habits.
+      Rules:
+      - Each action should be under 50 characters
+      - Be specific and realistic
+      - Base suggestions on their actual tags
+      - No numbering, no quotes, one per line
+      - Make it feel personal and achievable
+    `,
+    });
+
+    const raw = response.text || "";
+    const lines = raw
+      .split(/\r?\n/)
+      .map(line => line.trim().replace(/^[-•*]\s*/, ''))
+      .filter(Boolean)
+      .slice(0, 3)
+      .map(line => (line.length > 50 ? `${line.slice(0, 47)}...` : line));
+
+    return lines.length === 3 
+      ? lines 
+      : [
+          `Track your ${category} patterns daily`,
+          `Set one small improvement goal`,
+          `Celebrate your progress weekly`
+        ];
+  } catch (error) {
+    console.error("Error generating solo action items:", error);
+    return [
+      `Track your ${category} patterns daily`,
+      `Set one small improvement goal`,
+      `Celebrate your progress weekly`
+    ];
   }
 };

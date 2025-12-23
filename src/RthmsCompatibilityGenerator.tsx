@@ -11,6 +11,14 @@ import { Navigation } from './components/Navigation';
 import { TagSelectionPage } from './components/pages/TagSelectionPage';
 import { CompatibilityReportPage } from './components/pages/CompatibilityReportPage';
 import { ModeSelectionPage } from './components/pages/ModeSelectionPage';
+// Solo mode pages
+import { SoloOverallPage } from './components/pages/SoloOverallPage';
+import { SoloSleepPage } from './components/pages/SoloSleepPage';
+import { SoloActivityPage } from './components/pages/SoloActivityPage';
+import { SoloFoodPage } from './components/pages/SoloFoodPage';
+import { SoloLifestylePage } from './components/pages/SoloLifestylePage';
+import { SoloSuggestionPage } from './components/pages/SoloSuggestionPage';
+import { SoloReportPage } from './components/pages/SoloReportPage';
 
 // Helper to ensure all tag categories exist
 const ensureFullTags = (tags: Partial<PersonTags>): PersonTags => {
@@ -124,7 +132,114 @@ const RthmsCompatibilityGenerator = () => {
 
   console.log('Current selectedMode for AI:', selectedMode);
 
-  const pages = useMemo(() => [
+  // Solo mode pages
+  const soloPages = useMemo(() => [
+    {
+      type: 'solo-overall',
+      title: 'Your Profile',
+      render: () => <SoloOverallPage person={person1} />
+    },
+    {
+      type: 'solo-sleep',
+      title: 'Sleep Analysis',
+      render: () => <SoloSleepPage person={person1} />
+    },
+    {
+      type: 'solo-sleep-suggestions',
+      title: 'Sleep Tips',
+      render: () => (
+        <SoloSuggestionPage
+          category="sleep"
+          title="Sleep Optimization"
+          description="Personalized tips for better rest"
+          gradientFrom="from-slate-900"
+          gradientVia="via-indigo-950"
+          accentColor="from-purple-500 to-pink-600"
+          iconBgColor="bg-purple-500/20"
+          iconTextColor="text-purple-400"
+          hoverBorderColor="hover:border-purple-500/50"
+          person={person1}
+        />
+      )
+    },
+    {
+      type: 'solo-activity',
+      title: 'Activity Level',
+      render: () => <SoloActivityPage person={person1} />
+    },
+    {
+      type: 'solo-activity-suggestions',
+      title: 'Activity Tips',
+      render: () => (
+        <SoloSuggestionPage
+          category="activity"
+          title="Fitness Goals"
+          description="Level up your movement"
+          gradientFrom="from-slate-900"
+          gradientVia="via-orange-950"
+          accentColor="from-orange-500 to-red-600"
+          iconBgColor="bg-orange-500/20"
+          iconTextColor="text-orange-400"
+          hoverBorderColor="hover:border-orange-500/50"
+          person={person1}
+        />
+      )
+    },
+    {
+      type: 'solo-food',
+      title: 'Nutrition',
+      render: () => <SoloFoodPage person={person1} />
+    },
+    {
+      type: 'solo-food-suggestions',
+      title: 'Nutrition Tips',
+      render: () => (
+        <SoloSuggestionPage
+          category="food"
+          title="Healthy Eating"
+          description="Optimize your nutrition"
+          gradientFrom="from-slate-900"
+          gradientVia="via-emerald-950"
+          accentColor="from-emerald-500 to-teal-600"
+          iconBgColor="bg-emerald-500/20"
+          iconTextColor="text-emerald-400"
+          hoverBorderColor="hover:border-emerald-500/50"
+          person={person1}
+        />
+      )
+    },
+    {
+      type: 'solo-lifestyle',
+      title: 'Lifestyle',
+      render: () => <SoloLifestylePage person={person1} />
+    },
+    {
+      type: 'solo-lifestyle-suggestions',
+      title: 'Lifestyle Tips',
+      render: () => (
+        <SoloSuggestionPage
+          category="lifestyle"
+          title="Life Balance"
+          description="Optimize your daily rhythm"
+          gradientFrom="from-slate-900"
+          gradientVia="via-cyan-950"
+          accentColor="from-cyan-500 to-blue-600"
+          iconBgColor="bg-cyan-500/20"
+          iconTextColor="text-cyan-400"
+          hoverBorderColor="hover:border-cyan-500/50"
+          person={person1}
+        />
+      )
+    },
+    {
+      type: 'solo-final-report',
+      title: 'Your Report',
+      render: () => <SoloReportPage person={person1} />
+    }
+  ], [person1]);
+
+  // Compatibility mode pages (dating/friendship)
+  const compatibilityPages = useMemo(() => [
     {
       type: 'overall',
       title: 'Overall Match',
@@ -242,6 +357,9 @@ const RthmsCompatibilityGenerator = () => {
       )
     }
   ], [selectedMode, person1, person2, overallOverlap, sleepData, activityData, foodData, lifestyleData]);
+
+  // Choose pages based on mode
+  const pages = selectedMode === 'solo' ? soloPages : compatibilityPages;
 
   const nextPage = () => {
     if (currentPage < pages.length - 1) {
